@@ -70,7 +70,7 @@ flow start InternalMessage fromWho: BuyerProcurement, whereTo: BuyerFinance, mes
 [Optional verification]: run ```flow start ViewInboxByAccount acctname: BuyerFinance``` at Buyer' node terminal
 
 ## Step 3: Buyer's finance team send a payment to Seller's finance team
-Navigatie to Seller's node terminal and type in:
+Navigatie to Buyer's node terminal and type in:
 ```
 flow start SendPayment whoAmI: BuyerFinance, whereTo: SellerFinance, amount: 500
 ```
