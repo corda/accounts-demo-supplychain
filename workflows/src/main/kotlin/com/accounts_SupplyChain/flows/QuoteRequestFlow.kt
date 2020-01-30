@@ -6,6 +6,7 @@ import com.accounts_SupplyChain.states.QuoteState
 import com.r3.corda.lib.accounts.contracts.states.AccountInfo
 import com.r3.corda.lib.accounts.workflows.accountService
 import com.r3.corda.lib.accounts.workflows.flows.RequestKeyForAccount
+import javassist.NotFoundException
 import net.corda.core.flows.*
 import net.corda.core.identity.AnonymousParty
 import net.corda.core.identity.CordaX500Name
@@ -64,7 +65,7 @@ class QuoteRequestFlow(
         val insurerKey = targetAcctAnonymousParty.owningKey
 
         //Get Blocksure node
-        val blocksureParty = serviceHub.networkMapCache.getNodeByLegalName(CordaX500Name.parse("O=Blocksure,L=London,C=GB"))!!.legalIdentities.single()
+        val blocksureParty = serviceHub.networkMapCache.getPeerByLegalName(CordaX500Name.parse("O=Blocksure,L=London,C=GB")) ?: throw NotFoundException("Blocksure party not found")
         val blocksureKey = blocksureParty.owningKey
 
         //generating State for transfer
