@@ -49,7 +49,7 @@ class QuoteRequestFlow(
         )
     }
 
-    override val progressTracker = SendInvoice.tracker()
+    override val progressTracker = QuoteRequestFlow.tracker()
 
     @Suspendable
     override fun call(): String {
@@ -97,7 +97,7 @@ class QuoteRequestFlow(
     }
 }
 
-@InitiatedBy(SendInvoice::class)
+@InitiatedBy(QuoteRequestFlow::class)
 class QuoteRequestFlowResponder(val counterpartySession: FlowSession) : FlowLogic<Unit>(){
     @Suspendable
     override fun call() {
