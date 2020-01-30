@@ -8,7 +8,6 @@ import net.corda.core.identity.AnonymousParty
 
 @BelongsToContract(CargoStateContract::class)
 class CargoState(
-
         val pickUpFrom: AnonymousParty,
         val DeliverTo: AnonymousParty,
         val cargo: String,
