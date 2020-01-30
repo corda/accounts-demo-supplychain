@@ -14,7 +14,7 @@ class QuoteContract : Contract {
 
 
     override fun verify(tx: LedgerTransaction) {
-        val command = tx.commands.requireSingleCommand<Commands.Create>()
+        val command = tx.commands.requireSingleCommand<Commands.Quote>()
         requireThat {
             /*
              *
@@ -25,6 +25,6 @@ class QuoteContract : Contract {
     }
 
     interface Commands : CommandData {
-        class Create : Commands
+        class Quote : Commands
     }
 }
