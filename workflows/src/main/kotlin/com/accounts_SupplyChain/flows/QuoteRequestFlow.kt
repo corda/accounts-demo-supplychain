@@ -61,30 +61,30 @@ class QuoteRequestFlow(
 
         val insurerAccount = accountService.accountInfo(insurer).single().state.data
         val targetAcctAnonymousParty = subFlow(RequestKeyForAccount(insurerAccount))
+        val insurerKey = targetAcctAnonymousParty.owningKey
+
+        //Get Blocksure node
+        val blocksureParty = serviceHub.networkMapCache.getNodeByLegalName(CordaX500Name.parse("O=Blocksure,L=London,C=GB"))!!.legalIdentities.single()
+        val blocksureKey = blocksureParty.owningKey
 
         //generating State for transfer
         progressTracker.currentStep = QuoteRequestFlow.Companion.GENERATING_TRANSACTION
-        //Get Blocksure node
-        val blocksureParty = serviceHub.networkMapCache.getNodeByLegalName(CordaX500Name.parse("O=Blocksure,L=London,C=GB"))!!.legalIdentities.single()
-
         val output = QuoteState(UUID.randomUUID(), item, sumInsured, AnonymousParty(myKey),targetAcctAnonymousParty, blocksureParty)
         val transactionBuilder = TransactionBuilder(serviceHub.networkMapCache.notaryIdentities.first())
-
-        transactionBuilder.addOutputState(output)
-                .addCommand(QuoteContract.Commands.Quote(), listOf(targetAcctAnonymousParty.owningKey,myKey, blocksureParty.owningKey))
+        transactionBuilder.addOutputState(output).addCommand(QuoteContract.Commands.Quote(), listOf(insurerKey, myKey, blocksureKey))
 
         //Pass along Transaction
         progressTracker.currentStep = QuoteRequestFlow.Companion.SIGNING_TRANSACTION
-        val locallySignedTx = serviceHub.signInitialTransaction(transactionBuilder, listOfNotNull(ourIdentity.owningKey,myKey))
+        val locallySignedTx = serviceHub.signInitialTransaction(transactionBuilder, listOfNotNull(myKey, insurerKey, blocksureKey))
 
         //Collect from insurer
         progressTracker.currentStep = QuoteRequestFlow.Companion.GATHERING_SIGS
         val sessionForInsurerToSendTo = initiateFlow(insurerAccount.host)
-        val accountToMoveToSignature = subFlow(CollectSignatureFlow(locallySignedTx, sessionForInsurerToSendTo, targetAcctAnonymousParty.owningKey))
+        val accountToMoveToSignature = subFlow(CollectSignatureFlow(locallySignedTx, sessionForInsurerToSendTo, insurerKey))
 
         //Collect from blocksure
         val sessionForBlocksureToSendTo = initiateFlow(blocksureParty)
-        val blocksureSignature = subFlow(CollectSignatureFlow(locallySignedTx, sessionForBlocksureToSendTo, blocksureParty.owningKey))
+        val blocksureSignature = subFlow(CollectSignatureFlow(locallySignedTx, sessionForBlocksureToSendTo, blocksureKey))
 
         val signedByCounterParty = locallySignedTx.withAdditionalSignatures(sigList = accountToMoveToSignature + blocksureSignature)
 
@@ -92,7 +92,6 @@ class QuoteRequestFlow(
         val fullySignedTx = subFlow(FinalityFlow(signedByCounterParty, listOf(sessionForInsurerToSendTo, sessionForBlocksureToSendTo).filter { it.counterparty != ourIdentity }))
         val movedState = fullySignedTx.coreTransaction.outRefsOfType(
                 QuoteState::class.java
-
         ).single()
         return "Quote ${movedState.state.data.quoteId} send to " + brokerAccount.host.name.organisation + "'s "+ insurerAccount.name + " team" + blocksureParty.name.toString() + " node"
     }
