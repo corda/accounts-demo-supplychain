@@ -1,6 +1,5 @@
 package com.accounts_SupplyChain.states
 
-import com.accounts_SupplyChain.contracts.InvoiceStateContract
 import com.accounts_SupplyChain.contracts.QuoteContract
 import net.corda.core.contracts.*
 import net.corda.core.identity.AbstractParty

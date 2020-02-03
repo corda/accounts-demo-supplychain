@@ -14,7 +14,7 @@ import net.corda.core.node.services.vault.QueryCriteria
 @StartableByRPC
 @StartableByService
 @InitiatingFlow
-class GetQuoteFlow(
+class QuoteGetFlow(
         val acctname : String
 ) : FlowLogic<List<String>>() {
 

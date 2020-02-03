@@ -19,7 +19,7 @@ class CreateNewAccount(private val acctName:String) : FlowLogic<String>() {
         //Create a new account
         val newAccount = accountService.createAccount(name = acctName).toCompletableFuture().getOrThrow()
         val acct = newAccount.state.data
-        return ""+acct.name + " team's account was created. UUID is : " + acct.identifier
+        return ""+acct.name + " account was created. UUID is : " + acct.identifier
     }
 }
 

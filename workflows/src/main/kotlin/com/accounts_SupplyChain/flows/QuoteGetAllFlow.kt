@@ -13,7 +13,7 @@ import net.corda.core.node.services.vault.QueryCriteria
 @StartableByRPC
 @StartableByService
 @InitiatingFlow
-class GetAllQuoteFlow() : FlowLogic<List<String>>() {
+class QuoteGetAllFlow() : FlowLogic<List<String>>() {
 
     @Suspendable
     override fun call(): List<String> {
