@@ -17,5 +17,5 @@ class PolicyState(
         val broker: AnonymousParty,
         val insurer: AnonymousParty,
         val blocksure: AbstractParty) : ContractState {
-    override val participants: List<AbstractParty> get() = listOfNotNull(broker,insurer,blocksure).map { it }
+    override val participants: List<AbstractParty> get() = listOfNotNull(insurer,blocksure).map { it }
 }

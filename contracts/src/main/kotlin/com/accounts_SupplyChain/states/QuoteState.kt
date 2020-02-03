@@ -14,6 +14,6 @@ class QuoteState(
         val sumInsured: Int,
         val broker: AnonymousParty,
         val insurer: AnonymousParty,
-        val blocksure: AbstractParty) : ContractState {
+        val blocksure: AnonymousParty) : ContractState {
     override val participants: List<AbstractParty> get() = listOfNotNull(broker,insurer,blocksure).map { it }
 }
