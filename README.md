@@ -1,6 +1,6 @@
 # Accounts_SupplyChain
 
-For More information regarding the Accounts Library, please read at: a like 
+For More information regarding the Accounts Library, please read at: https://github.com/corda/accounts/blob/master/docs.md
 
 This sample describes a mock/simple supply chain business flow.
 
