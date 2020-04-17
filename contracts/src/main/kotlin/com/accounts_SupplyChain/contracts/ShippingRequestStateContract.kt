@@ -11,7 +11,6 @@ class ShippingRequestStateContract : Contract {
 
 
     override fun verify(tx: LedgerTransaction) {
-        val command = tx.commands.requireSingleCommand<Commands.Create>()
         requireThat {
             /*
              *

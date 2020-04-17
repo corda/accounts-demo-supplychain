@@ -66,7 +66,7 @@ class GetAllInterestedAccountsFlow(val accountId: UUID) : FlowLogic<List<Account
             loadedAccount?.broadcastAccounts?.size
             refHolder.set(loadedAccount)
         })
-        return refHolder.get()?.let { it.broadcastAccounts?.mapNotNull(getAccountFromAccountId(accountService)) }
+        return refHolder.get()?.let { it.broadcastAccounts?.mapNotNull(getAccountFromAccountId(serviceHub.cordaService(KeyManagementBackedAccountService::class.java))) }
                 ?: listOf()
     }
 

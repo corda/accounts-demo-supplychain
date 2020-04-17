@@ -88,11 +88,7 @@ class SendInvoice(
         val signedByCounterParty = locallySignedTx.withAdditionalSignatures(accountToMoveToSignature)
 
         progressTracker.currentStep =FINALISING_TRANSACTION
-        val fullySignedTx = subFlow(FinalityFlow(signedByCounterParty, listOf(sessionForAccountToSendTo).filter { it.counterparty != ourIdentity }))
-        val movedState = fullySignedTx.coreTransaction.outRefsOfType(
-                InvoiceState::class.java
-
-        ).single()
+        subFlow(FinalityFlow(signedByCounterParty, listOf(sessionForAccountToSendTo).filter { it.counterparty != ourIdentity }))
         return "Invoice send to " + targetAccount.host.name.organisation + "'s "+ targetAccount.name + " team."
     }
 }
@@ -106,9 +102,9 @@ class SendInvoiceResponder(val counterpartySession: FlowSession) : FlowLogic<Uni
 
         //extract account information from transaction
         val transactionSigner = object : SignTransactionFlow(counterpartySession) {
-            override fun checkTransaction(tx: SignedTransaction) {
-                val keyStateMovedTo = tx.coreTransaction.outRefsOfType(InvoiceState::class.java).first().state.data.recipient
-                keyStateMovedTo?.let {
+            override fun checkTransaction(stx: SignedTransaction) {
+                val keyStateMovedTo = stx.coreTransaction.outRefsOfType(InvoiceState::class.java).first().state.data.recipient
+                keyStateMovedTo.let {
                     accountMovedTo.set(accountService.accountInfo(keyStateMovedTo.owningKey)?.state?.data)
                 }
                 if (accountMovedTo.get() == null) {

@@ -56,12 +56,6 @@ class InternalMessage(
 
     override val progressTracker = tracker()
 
-
-
-
-
-
-
     @Suspendable
     override fun call(): String {
 
@@ -94,12 +88,7 @@ class InternalMessage(
         val signedByCounterParty = locallySignedTx.withAdditionalSignatures(accountToMoveToSignature)
 
         progressTracker.currentStep = FINALISING_TRANSACTION
-        val fullySignedTx = subFlow(FinalityFlow(signedByCounterParty, listOf(sessionForAccountToSendTo).filter { it.counterparty != ourIdentity }))
-
-
-        val movedState = fullySignedTx.coreTransaction.outRefsOfType(
-                InternalMessageState::class.java
-        ).single()
+        subFlow(FinalityFlow(signedByCounterParty, listOf(sessionForAccountToSendTo).filter { it.counterparty != ourIdentity }))
         return "Inform " + targetAccount.name + " to " + message + "."
     }
 }
@@ -110,9 +99,9 @@ class InternalMessageResponder(val counterpartySession: FlowSession) : FlowLogic
     override fun call() {
         val accountMovedTo = AtomicReference<AccountInfo>()
         val transactionSigner = object : SignTransactionFlow(counterpartySession) {
-            override fun checkTransaction(tx: SignedTransaction) {
-                val keyStateMovedTo = tx.coreTransaction.outRefsOfType(InternalMessageState::class.java).first().state.data.to.owningKey
-                keyStateMovedTo?.let {
+            override fun checkTransaction(stx: SignedTransaction) {
+                val keyStateMovedTo = stx.coreTransaction.outRefsOfType(InternalMessageState::class.java).first().state.data.to.owningKey
+                keyStateMovedTo.let {
                     accountMovedTo.set(accountService.accountInfo(keyStateMovedTo)?.state?.data)
                 }
 

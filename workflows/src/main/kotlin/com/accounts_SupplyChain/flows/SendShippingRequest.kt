@@ -85,11 +85,7 @@ class SendShippingRequest(
         val signedByCounterParty = locallySignedTx.withAdditionalSignatures(accountToMoveToSignature)
 
         progressTracker.currentStep =FINALISING_TRANSACTION
-        val fullySignedTx = subFlow(FinalityFlow(signedByCounterParty, listOf(sessionForAccountToSendTo).filter { it.counterparty != ourIdentity }))
-        val movedState = fullySignedTx.coreTransaction.outRefsOfType(
-                ShippingRequestState::class.java
-
-        ).single()
+        subFlow(FinalityFlow(signedByCounterParty, listOf(sessionForAccountToSendTo).filter { it.counterparty != ourIdentity }))
         return "Request"+ shipper.name +" to send " + Cargo+ " to " + targetAccount.host.name.organisation + "'s "+ targetAccount.name + " team"
     }
 }
@@ -98,15 +94,14 @@ class SendShippingRequest(
 class SendShippingRequestResponder(val counterpartySession: FlowSession) : FlowLogic<Unit>(){
     @Suspendable
     override fun call() {
-        val accountMovedTo = AtomicReference<AccountInfo>()
         val transactionSigner = object : SignTransactionFlow(counterpartySession) {
-            override fun checkTransaction(tx: SignedTransaction) {
+            override fun checkTransaction(stx: SignedTransaction) {
 
             }
         }
         val transaction = subFlow(transactionSigner)
         if (counterpartySession.counterparty != serviceHub.myInfo.legalIdentities.first()) {
-            val recievedTx = subFlow(
+            subFlow(
                     ReceiveFinalityFlow(
                             counterpartySession,
                             expectedTxId = transaction.id,

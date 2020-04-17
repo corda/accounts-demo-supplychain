@@ -80,11 +80,7 @@ class SendCargo(
         val signedByCounterParty = locallySignedTx.withAdditionalSignatures(accountToMoveToSignature)
 
         progressTracker.currentStep =FINALISING_TRANSACTION
-        val fullySignedTx = subFlow(FinalityFlow(signedByCounterParty, listOf(sessionForAccountToSendTo).filter { it.counterparty != ourIdentity }))
-        val movedState = fullySignedTx.coreTransaction.outRefsOfType(
-                CargoState::class.java
-
-        ).single()
+        subFlow(FinalityFlow(signedByCounterParty, listOf(sessionForAccountToSendTo).filter { it.counterparty != ourIdentity }))
         return "send " + cargo+ " to " + targetAccount.host.name.organisation + "'s "+ targetAccount.name + " team"
     }
 }
@@ -95,9 +91,9 @@ class SendCargoResponder(val counterpartySession: FlowSession) : FlowLogic<Unit>
     override fun call() {
         val accountMovedTo = AtomicReference<AccountInfo>()
         val transactionSigner = object : SignTransactionFlow(counterpartySession) {
-            override fun checkTransaction(tx: SignedTransaction) {
-                val keyStateMovedTo = tx.coreTransaction.outRefsOfType(CargoState::class.java).first().state.data.DeliverTo.owningKey
-                keyStateMovedTo?.let {
+            override fun checkTransaction(stx: SignedTransaction) {
+                val keyStateMovedTo = stx.coreTransaction.outRefsOfType(CargoState::class.java).first().state.data.DeliverTo.owningKey
+                keyStateMovedTo.let {
                     accountMovedTo.set(accountService.accountInfo(keyStateMovedTo)?.state?.data)
                 }
 
