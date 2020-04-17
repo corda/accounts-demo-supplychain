@@ -28,7 +28,6 @@ buildscript {
         mavenLocal()
         mavenCentral()
         jcenter()
-        maven { url 'http://ci-artifactory.corda.r3cev.com/artifactory/corda-lib-dev' }
         maven { url 'http://ci-artifactory.corda.r3cev.com/artifactory/corda-lib' }
         maven { url 'https://ci-artifactory.corda.r3cev.com/artifactory/corda' }
         // Corda dependencies for the patched Quasar version
