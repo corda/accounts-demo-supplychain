@@ -1,3 +1,6 @@
+## 
+This sample has officially moved to the Account section in the [samples-kotlin](https://github.com/corda/samples-kotlin).
+
 # Accounts_SupplyChain
 
 For More information regarding the Accounts Library, please read at: https://github.com/corda/accounts/blob/master/docs.md
